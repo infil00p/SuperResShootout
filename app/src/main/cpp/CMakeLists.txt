@@ -89,6 +89,7 @@ add_library( # Sets the name of the library.
         PyTorchSuperRes.cpp
         TFSuperRes.cpp
         SuperRes.cpp
+        Model.cpp
         # Provides a relative path to your source file(s).
         native-lib.cpp)
 
