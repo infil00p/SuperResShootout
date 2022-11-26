@@ -64,7 +64,7 @@ std::string MLStats::SuperRes::postProcessImage(std::vector<cv::Mat> & yCrCb, cv
     return outUri;
 }
 
-MLStats::SuperRes::SuperRes() {
+MLStats::SuperRes::SuperRes(MLStats::Device cDevice, MLStats::DataType cType) : Model(cDevice, cType) {
     for(int i = 1; i < 26; ++i) {
         std::string current_file;
         if(i < 10) {

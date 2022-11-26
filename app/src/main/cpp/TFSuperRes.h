@@ -14,20 +14,35 @@ namespace MLStats
 {
 
 
-    class TFSuperRes : SuperRes {
+    class TFSuperRes : public SuperRes {
     public:
+        TFSuperRes(Device cDevice, DataType cType) : SuperRes(cDevice, cType)
+        {
+
+        }
         bool loadModel();
         std::vector<ResultSet> doTestRun(std::string & externalPath);
         ~TFSuperRes() {
             TfLiteInterpreterDelete(interpreter);
-            TfLiteInterpreterOptionsDelete(options);
+            TfLiteInterpreterOptionsDelete(mOptions);
+            if(delegate != nullptr)
+            {
+                if(getDevice() == MLStats::Device::NNAPI)
+                {
+                    TfLiteNnapiDelegateDelete(delegate);
+                }
+                else
+                {
+                    TfLiteGpuDelegateV2Delete(delegate);
+                }
+            }
 
             TfLiteModelDelete(model);
         }
 
     private:
         TfLiteModel * model;
-        TfLiteInterpreterOptions * options;
+        TfLiteInterpreterOptions * mOptions;
         TfLiteInterpreter* interpreter;
         TfLiteDelegate* delegate = nullptr;
         std::string FRAMEWORK = "tflite";

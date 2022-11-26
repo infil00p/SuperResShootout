@@ -49,6 +49,7 @@ std::vector <MLStats::ResultSet> MLStats::ORTSuperRes::doTestRun(std::string & e
         record.imageUri = this->postProcessImage(yCrCb, outputGreyscale, i, FRAMEWORK, externalPath);
         // Create ResultSet record and push it on the results
 
+        record.device = "CPU";
         output.push_back(record);
     }
     return output;

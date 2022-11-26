@@ -13,9 +13,9 @@ bool MLStats::PyTorchSuperRes::loadModel() {
     }
 
     MobileCallGuard guard;
-    if(isNHWC)
+    if(getDevice() == MLStats::Device::GPU)
     {
-        mModule = torch::jit::load(PYTORCH_PATH + "superres_nhwc.pt");
+        mModule = torch::jit::load(PYTORCH_PATH + "superres_vulkan.pt");
     }
     else
     {
@@ -39,17 +39,23 @@ std::vector <MLStats::ResultSet> MLStats::PyTorchSuperRes::doTestRun(std::string
         std::tie(yCrCb, greyscale) = preProcessImage(filePaths[i]);
         const auto sizes = std::vector<int64_t>{1, 1, 224, 224};
 
-        auto input = torch::from_blob(
+        std::vector<torch::jit::IValue> pytorchInputs;
+        at::Tensor input  = torch::from_blob(
                 (float * )(greyscale.data),
                 torch::IntArrayRef(sizes),
                 at::TensorOptions(at::kFloat));
-        std::vector<torch::jit::IValue> pytorchInputs;
-        pytorchInputs.push_back(input);
+        if(getDevice() == MLStats::Device::GPU && at::is_vulkan_available()) {
+            auto gpuInput = input.vulkan();
+            pytorchInputs.emplace_back(gpuInput);
+        }
+        else
+        {
+            pytorchInputs.emplace_back(input);
+        }
 
         auto start = std::chrono::steady_clock::now();
         auto pyTorchOutput = [&]() {
             MobileCallGuard guard;
-
             return mModule.forward(pytorchInputs);
         }();
         auto end = std::chrono::steady_clock::now();
@@ -58,7 +64,17 @@ std::vector <MLStats::ResultSet> MLStats::PyTorchSuperRes::doTestRun(std::string
 
         if (pyTorchOutput.tagKind() == "Tensor")
         {
-            auto outTensor = pyTorchOutput.toTensor();
+            at::Tensor outTensor;
+            auto rawOutTensor = pyTorchOutput.toTensor();
+            if(getDevice() == MLStats::Device::GPU && at::is_vulkan_available()) {
+                outTensor = rawOutTensor.cpu();
+                record.device="GPU (Vulkan)";
+            }
+            else {
+                outTensor = rawOutTensor;
+                record.device="CPU";
+            }
+
             // Wrap the Tensor
             cv::Mat outputGreyscale(cv::Size(672,672), CV_32F, outTensor.data_ptr());
             record.imageUri = this->postProcessImage(yCrCb, outputGreyscale, i, FRAMEWORK, externalPath);

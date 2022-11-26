@@ -25,11 +25,65 @@
          />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/descriptionView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:text="@string/description"
-        app:layout_constraintTop_toBottomOf="@id/button"
+        app:layout_constraintTop_toBottomOf="@id/accelGroup"
          />
+
+    <RadioGroup
+        android:id="@+id/accelGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/fwGroup"
+        app:layout_constraintTop_toBottomOf="@id/button"
+        android:layout_marginStart="40dp"
+        >
+        <RadioButton
+            android:id="@+id/cpuRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CPU"
+            />
+        <RadioButton
+            android:id="@+id/gpuRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPU"
+            />
+        <RadioButton
+            android:id="@+id/nnapiRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NNAPI"
+            />
+    </RadioGroup>
+    <RadioGroup
+        android:id="@+id/fwGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/button"
+        >
+        <RadioButton
+            android:id="@+id/tfLiteRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tflite"
+            />
+        <RadioButton
+            android:id="@+id/pyTorchRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pytorch"
+            />
+        <RadioButton
+            android:id="@+id/ortRadio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/onnxruntime"
+            />
+    </RadioGroup>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

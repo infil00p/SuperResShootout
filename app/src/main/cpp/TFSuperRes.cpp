@@ -3,6 +3,8 @@
 //
 
 #include <tensorflow/lite/c/common.h>
+#include <tensorflow/lite/delegates/gpu/delegate.h>
+#include <tensorflow/lite/delegates/nnapi/nnapi_delegate_c_api.h>
 #include "TFSuperRes.h"
 #include <chrono>
 #include <android/log.h>
@@ -16,14 +18,28 @@
 bool MLStats::TFSuperRes::loadModel() {
     std::string fullPath = TF_PATH + "model_float32.tflite";
     model = TfLiteModelCreateFromFile(fullPath.c_str());
-    options = TfLiteInterpreterOptionsCreate();
+    mOptions = TfLiteInterpreterOptionsCreate();
+
+    if(getDevice() == MLStats::Device::NNAPI)
+    {
+        TfLiteNnapiDelegateOptions options = TfLiteNnapiDelegateOptionsDefault();
+        delegate = TfLiteNnapiDelegateCreate(&options);
+        TfLiteInterpreterOptionsAddDelegate(mOptions, delegate);
+    }
+    else if(getDevice() == MLStats::Device::GPU)
+    {
+        TfLiteGpuDelegateOptionsV2 options = TfLiteGpuDelegateOptionsV2Default();
+        delegate = TfLiteGpuDelegateV2Create(&options);
+        TfLiteInterpreterOptionsAddDelegate(mOptions, delegate);
+    }
+
     return model != nullptr;
 }
 
 std::vector <MLStats::ResultSet> MLStats::TFSuperRes::doTestRun(std::string & externalPath) {
     std::vector <ResultSet> output;
     // Create the interpreter
-    interpreter = TfLiteInterpreterCreate(model, options);
+    interpreter = TfLiteInterpreterCreate(model, mOptions);
     // Allocate the tensors to warm up the model
     TfLiteInterpreterAllocateTensors(interpreter);
     for(size_t i = 0; i < filePaths.size(); ++i) {
@@ -33,7 +49,6 @@ std::vector <MLStats::ResultSet> MLStats::TFSuperRes::doTestRun(std::string & ex
         ResultSet record;
         record.framework = "TFLite";
         std::tie(yCrCb, greyscale) = preProcessImage(filePaths[i]);
-
 
         TfLiteTensor * input_tensor = TfLiteInterpreterGetInputTensor(interpreter, 0);
         std::string name_of_tensor = std::string(TfLiteTensorName(input_tensor));
@@ -60,6 +75,12 @@ std::vector <MLStats::ResultSet> MLStats::TFSuperRes::doTestRun(std::string & ex
         cv::Mat outputGreyscale = cv::Mat(672, 672, CV_32F, outBuffer.data());
         record.imageUri = this->postProcessImage(yCrCb, outputGreyscale, i, FRAMEWORK, externalPath);
         // Create ResultSet record and push it on the results
+        if(getDevice() == MLStats::Device::GPU) {
+            record.device="GPU (OpenCL/OpenGL)";
+        }
+        else {
+            record.device="CPU";
+        }
 
         output.push_back(record);
     }

@@ -12,13 +12,9 @@
 
 namespace MLStats {
 
-
-
-
-
-    class SuperRes : Model {
+    class SuperRes : public Model {
     public:
-        SuperRes();
+        SuperRes(Device cDevice, DataType cType);
         virtual bool loadModel() = 0;
         virtual std::vector<ResultSet> doTestRun(std::string & externalPath) = 0;
         std::pair<std::vector<cv::Mat>, cv::Mat> preProcessImage(std::string path);

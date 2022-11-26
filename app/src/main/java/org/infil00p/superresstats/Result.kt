@@ -2,7 +2,7 @@ package org.infil00p.superresstats
 
 import java.util.*
 
-class Result(val framework: String, val duration: Double, val imageUri: String  ) {
+class Result(val framework: String, val duration: Double, val imageUri: String, val device: String ) {
 
 }
 

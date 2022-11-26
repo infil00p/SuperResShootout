@@ -10,10 +10,12 @@
 namespace MLStats
 {
 
-
-
-    class ORTSuperRes : SuperRes {
+    class ORTSuperRes : public SuperRes {
     public:
+        ORTSuperRes(Device cDevice, DataType cType) : SuperRes(cDevice, cType)
+        {
+
+        }
         ~ORTSuperRes() {
             if(session != nullptr)
             {

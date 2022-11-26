@@ -12,26 +12,16 @@
 
 namespace MLStats
 {
-    class PyTorchSuperRes : SuperRes {
+    class PyTorchSuperRes : public SuperRes {
     public:
-        PyTorchSuperRes(bool nhwc = false) {
-            isNHWC = nhwc;
-            if(isNHWC)
-            {
-                // LOLWTF?!?!  SO MUCH FOR THIS BEING CONSTANT
-                FRAMEWORK="pytorch_nhwc";
-            }
-            else
-            {
-                FRAMEWORK="pytorch";
-            }
+        PyTorchSuperRes(Device cDevice, DataType cType) : SuperRes(cDevice, cType) {
         }
         bool loadModel();
         std::vector<ResultSet> doTestRun(std::string & externalPath);
     private:
         mutable torch::jit::script::Module mModule;
-        std::string FRAMEWORK;
-        bool isNHWC;
+        std::string FRAMEWORK="pytorch";
+        bool isNHWC=false;
     };
 }
 

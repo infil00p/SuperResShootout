@@ -24,13 +24,16 @@ void MLStats::Model::createReport(std::vector<MLStats::ResultSet> & results,
         rapidjson::Value o(rapidjson::kObjectType);
         rapidjson::Value framework(rapidjson::kStringType);
         rapidjson::Value path(rapidjson::kStringType);
+        rapidjson::Value device(rapidjson::kStringType);
         rapidjson::Value duration(rapidjson::kNumberType);
         framework.SetString(result.framework.c_str(), result.framework.size(), d.GetAllocator());
         path.SetString(result.imageUri.c_str(), result.imageUri.size(), d.GetAllocator());
+        device.SetString(result.device.c_str(), result.device.size(), d.GetAllocator());
         duration.SetDouble(result.duration);
         o.AddMember("framework", framework, d.GetAllocator());
         o.AddMember("imagePath", path, d.GetAllocator());
         o.AddMember("duration", duration, d.GetAllocator());
+        o.AddMember("device", device, d.GetAllocator());
         a.PushBack(o, d.GetAllocator());
     }
     d.AddMember("results", a, d.GetAllocator());

@@ -35,10 +35,24 @@ namespace MLStats
         std::string dataType;
     };
 
+    /*
+     * Abstraction for running the model in the harness
+     * The expectation is that this class will be overriden for pre and post processing code
+     * and the modelPath is optional
+     */
 
     class Model {
     public:
+        Model(Device device, DataType type) {
+            mDataType = type;
+            mDevice = device;
+        }
         static void createReport(std::vector<MLStats::ResultSet> & results, std::string & externalPath);
+        Device getDevice() { return mDevice; }
+        DataType getDataType() { return mDataType; }
+    protected:
+        DataType mDataType;
+        Device mDevice;
     };
 
 }

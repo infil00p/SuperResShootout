@@ -84,7 +84,7 @@ class AssetHandler internal constructor(var mCtx: Context) {
             assetManager,
             arrayOf(
                 "superres.pt",
-                "superres_nhwc.pt"
+                "superres_vulkan.pt"
             )
         )
 

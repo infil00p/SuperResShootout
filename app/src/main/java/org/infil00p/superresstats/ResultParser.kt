@@ -29,6 +29,7 @@ class ResultParser {
             while (reader.hasNext()) {
                 lateinit var framework: String
                 lateinit var filename: String
+                lateinit var device: String
                 var duration: Double
                 duration = 0.0
                 reader.beginObject()
@@ -40,12 +41,14 @@ class ResultParser {
                         duration = reader.nextDouble()
                     } else if (name.equals("imagePath")) {
                         filename = reader.nextString()
+                    } else if (name.equals("device")) {
+                        device = reader.nextString()
                     } else {
                         reader.skipValue()
                     }
                 }
                 reader.endObject()
-                val result = Result(framework, duration, filename)
+                val result = Result(framework, duration, filename, device)
                 resultVector.add(result)
             }
         }
